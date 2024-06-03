@@ -1,0 +1,10 @@
+{
+    "testSnippet": {
+      "prefix": "// test",
+      "body": [
+        "// test",
+        "// endTest"
+      ],
+      "description": "Insert test snippet"
+    }
+  }
