@@ -1,5 +1,6 @@
 import * as vscode from "vscode";
 import { buildConsoleStatement } from "../utils/buildConsoleStatement";
+import { getFileName, capitalizeFirstLetter } from "../utils/index";
 
 export const getCodeTip = () => {
   return vscode.languages.registerCompletionItemProvider(
@@ -9,73 +10,47 @@ export const getCodeTip = () => {
         doc: vscode.TextDocument,
         position: vscode.Position
       ) {
-        const linePrefix = doc
-          .lineAt(position)
-          .text.substr(0, position.character)
+        // 获取当前行文本
+        const lineText = doc
+        .lineAt(position)
+        .text;
+        const linePrefix = lineText.substr(0, position.character)
           .trim();
-        console.log(linePrefix, "111");
-        const editor = vscode.window.activeTextEditor;
-        if (editor) {
-          const selectedText = editor.document.getText(editor.selection);
-          const currentLineNumber = editor.selection.active.line;
-          console.log(currentLineNumber, "222");
-
-          const currentLineText =
-            editor.document.lineAt(currentLineNumber).text;
-          console.log(currentLineText, "333");
-        }
+        // 当前行号 2的原因是从0开始，还要换行
+        const currentLineNumber = position.line + 2;
+        
+        //  当前文件名
+        const fileName = getFileName(doc.fileName);
+        // 获取当前行的缩进
+        const currentLineIndentation = lineText.match(/^\s*/)?.[0] || '';
+        
 
         if (/^\/|\/\/\s*(test|log|todo)\s/.test(linePrefix)) {
-          console.log(linePrefix);
-          const completionItem = new vscode.CompletionItem(
-            "// test\n// endTest",
-            vscode.CompletionItemKind.Snippet
-          );
           // 定义替换范围
           const startPos = position.with(
             position.line,
             linePrefix.lastIndexOf("//")
           );
-          console.log(startPos);
-
           const endPos = position.with(position.line, linePrefix.length);
-          console.log(endPos);
-          const arrStr = [
-            "// test\n// endTest",
-            "// log\n// endLog",
-            "// todo\n// endTodo",
-          ];
-          //   const consoleStatement = buildConsoleStatement(
-          //     selectedText,
-          //     currentLineNumber + 2
-          //   );
-          const consoleStatement = buildConsoleStatement("test", 2);
-          console.log(consoleStatement);
 
+          const arrOptions = ['test', 'log', 'todo'];
+          // 拼接获取要打印的字符串
+          const arrStr = arrOptions.map(item=>{
+            let text = item === 'log' ? buildConsoleStatement("", currentLineNumber, fileName, true) : '$0';
+            text = (item === 'todo' ? '// ' : '') + text;
+            return  `${currentLineIndentation}// ${item}\n${currentLineIndentation}${text}\n${currentLineIndentation}// end${capitalizeFirstLetter(item)}\n`;
+          });
           const arr = new Array(3).fill(null).map((unused, index) => {
             const item = new vscode.CompletionItem(
               arrStr[index],
               vscode.CompletionItemKind.Snippet
             );
             item.range = new vscode.Range(startPos, endPos);
+            // 实际插入的代码片段，可以定位到&0位置
+            item.insertText = new vscode.SnippetString(arrStr[index]);
             return item;
           });
-          console.log(arr);
           return arr;
-          //   return [
-          //     new vscode.CompletionItem(
-          //       "// test\n// endTest",
-          //       vscode.CompletionItemKind.Snippet
-          //     ),
-          //     new vscode.CompletionItem(
-          //       "// log\n// endLog",
-          //       vscode.CompletionItemKind.Snippet
-          //     ),
-          //     new vscode.CompletionItem(
-          //       "// todo\n// endTodo",
-          //       vscode.CompletionItemKind.Snippet
-          //     ),
-          //   ];
         }
         return undefined;
       },

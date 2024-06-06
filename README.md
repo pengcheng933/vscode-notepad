@@ -35,6 +35,10 @@ Calling out known issues can help limit users opening duplicate issues against y
 
 Users appreciate release notes as you update your extension.
 
+## 感谢
+
+本扩展借鉴了vscode-loghuu扩展，github地址[text](https://github.com/sharebravery/vscode-loghuu)
+
 ### 1.0.0
 
 Initial release of ...

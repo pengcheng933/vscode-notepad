@@ -16,10 +16,36 @@
   "contributes": {
     "commands": [
       {
-        "command": "xpc.notepad",
-        "title": "xpc-notepad"
+        "command": "xpc.printLog",
+        "title": "xpc-printLog"
       }
     ],
+    "keybindings": [
+      {
+        "key": "ctrl+shift+r",
+        "mac": "ctrl+shift+r",
+        "command": "xpc.printLog",
+        "when": "editorTextFocus"
+      }
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "notepadSidebar",
+          "title": "notepad",
+          "icon": "images/package-explorer.png"
+        }
+      ]
+    },
+    "views": {
+      "notepadSidebar": [
+        {
+          "type": "webview",
+          "id": "package-dependencies",
+          "name": "详情"
+        }
+      ]
+    },
     "languages": [
       {
         "id": "javascript",
@@ -43,7 +69,8 @@
     "watch": "tsc -watch -p ./",
     "pretest": "yarn run compile && yarn run lint",
     "lint": "eslint src --ext ts",
-    "test": "vscode-test"
+    "test": "vscode-test",
+    "build": "vsce package --no-yarn"
   },
   "devDependencies": {
     "@types/vscode": "^1.89.0",
